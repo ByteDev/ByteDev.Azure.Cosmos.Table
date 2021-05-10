@@ -62,3 +62,4 @@ Delete
 - DeleteAsync
 - DeleteAllAsync
 - DeleteIfExistsAsync
+- DeleteIfOlderThanAsync

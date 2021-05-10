@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ByteDev.Azure.Cosmos.Table.Model;
@@ -275,6 +276,14 @@ namespace ByteDev.Azure.Cosmos.Table
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="entities" /> is null.</exception>
         Task DeleteIfExistsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes all entities older than the supplied DateTime using an entity Timestamp.
+        /// </summary>
+        /// <param name="dateTime">Entities older than this DateTime will be deleted.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        Task DeleteIfOlderThanAsync(DateTime dateTime, CancellationToken cancellationToken = default);
 
         #endregion
     }

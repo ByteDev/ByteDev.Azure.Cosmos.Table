@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ByteDev.Azure.Cosmos.Table.IntTests.Entities;
 using ByteDev.Azure.Cosmos.Table.Model;
@@ -879,6 +880,31 @@ namespace ByteDev.Azure.Cosmos.Table.IntTests
                 var entity = await _sut.GetByKeysAsync(e1.PartitionKey, e1.RowKey);
 
                 Assert.That(entity, Is.Null);
+            }
+        }
+
+        [TestFixture]
+        public class DeleteIfOlderThanAsync : TableRepositoryTests
+        {
+            [Test]
+            public async Task WhenMultipleEntities_ThenDeleteOnlyOlder()
+            {
+                var e1 = PersonTestBuilder.InMemory.WithAge("10").Build();
+                var e2 = PersonTestBuilder.InMemory.WithAge("20").Build();
+
+                await InsertAsync(e1);
+
+                Thread.Sleep(3000);
+
+                await InsertAsync(e2);
+
+                var entity1 = await _sut.FindByAsync("Age", "10");
+
+                await _sut.DeleteIfOlderThanAsync(entity1.Single().Timestamp.AddSeconds(1).DateTime);
+
+                var entities = await _sut.GetAllAsync();
+
+                Assert.That(entities.Single().Age, Is.EqualTo("20"));
             }
         }
 

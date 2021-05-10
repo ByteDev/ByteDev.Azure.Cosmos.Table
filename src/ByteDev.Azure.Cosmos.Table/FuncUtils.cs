@@ -23,7 +23,7 @@ namespace ByteDev.Azure.Cosmos.Table
             }
         }
 
-        public static async Task WhenAllAsync<TEntity>(Func<TEntity, Task> func, IEnumerable<TEntity> entities, int maxRunningTasks = 100) where TEntity : class, ITableEntity, new()
+        public static async Task WhenAllAsync<TEntity>(Func<TEntity, Task> func, IEnumerable<TEntity> entities, int maxRunningTasks = 10) where TEntity : class, ITableEntity, new()
         {
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));

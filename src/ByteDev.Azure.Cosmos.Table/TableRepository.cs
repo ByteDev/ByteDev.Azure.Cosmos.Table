@@ -16,6 +16,7 @@ namespace ByteDev.Azure.Cosmos.Table
     {
         private const string PartitionKeyName = "PartitionKey";
         private const string RowKeyName = "RowKey";
+        private const string Timestamp = "Timestamp";
 
         private readonly CloudTable _table;
 
@@ -476,6 +477,24 @@ namespace ByteDev.Azure.Cosmos.Table
         public Task DeleteIfExistsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             return FuncUtils.WhenAllAsync(e => DeleteIfExistsAsync(e, cancellationToken), entities);
+        }
+
+        /// <summary>
+        /// Deletes all entities older than the supplied DateTime using an entity Timestamp.
+        /// </summary>
+        /// <param name="dateTime">Entities older than this DateTime will be deleted.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task DeleteIfOlderThanAsync(DateTime dateTime, CancellationToken cancellationToken = default)
+        {
+            var filter = TableQuery.GenerateFilterConditionForDate(Timestamp, QueryComparisons.LessThan, dateTime);
+
+            var query = new TableQuery<TEntity>()
+                .Where(filter);
+
+            var entities = await _table.ExecuteQueryAsync(query, cancellationToken);
+
+            await FuncUtils.WhenAllAsync(e => DeleteIfExistsAsync(e, cancellationToken), entities);
         }
 
         #endregion
